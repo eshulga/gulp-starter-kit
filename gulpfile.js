@@ -19,6 +19,9 @@ const stylelint = require("gulp-stylelint");
 const rename = require("gulp-rename");
 const server = require("browser-sync").create();
 const sequence = require("run-sequence");
+const babel = require("gulp-babel");
+const uglify = require("gulp-uglify");
+const concat = require("gulp-concat");
 
 // Создаем таск для сборки html файлов
 gulp.task("html", () => {
@@ -41,6 +44,29 @@ gulp.task("html", () => {
       .pipe(server.stream())
   );
 });
+
+//таск для сборки js
+
+gulp.task("js", ()=>{
+  return (
+    gulp.src("./src/js/*.js")
+    .pipe(
+      babel({
+        presets: ['env']
+      })
+    )
+    .pipe(
+      concat('all.js')
+    )
+    .pipe(
+      uglify()
+    )
+    .pipe(
+      gulp.dest("./build/js")
+    )
+  );
+});
+
 
 // Создаем таск для сборки css файлов
 gulp.task("css", () => {
@@ -131,6 +157,7 @@ gulp.task("watch", () => {
   gulp.watch("./src/sass/**/*.scss", ["css"]);
   // Следим за изменениями картинок и вызываем таск 'img' на каждом изменении
   // gulp.watch("./src/img/**/*.*", ["webp", "img"]);
+  gulp.watch("./src/js/*.js");
 });
 
 // Таск создания и запуска веб-сервера
@@ -166,6 +193,7 @@ gulp.task("build", function(done) {
     "fonts",
     "css",
     "html",
+    "js",
     done
   );
 });
